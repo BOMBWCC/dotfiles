@@ -1,0 +1,72 @@
+## bombwcc Gruvbox semantic color overrides
+##
+## GNU nano accepts three-digit RGB colors and approximates them with the
+## terminal palette. These are the nearest forms of the six-digit colors in
+## themes/gruvbox/color-system.md:
+##   #ebdbb2 -> #edb   text
+##   #928374 -> #987   comments
+##   #d79921 -> #d92   keywords, strings, operators, changed lines
+##   #689d6a -> #696   escapes, options, regex, annotations, attributes
+##   #b16286 -> #b68   numbers and language constants
+##   #98971a -> #992   functions, commands, macros and tags
+##   #b8bb26 -> #bb2   inserted lines and generic brackets
+##   #cc241d -> #c22   invalid text, trailing spaces and deleted lines
+##   #83a598 -> #8a9   types, classes and namespaces
+
+## Zsh / Shell
+extendsyntax ZSH color #edb ".*"
+extendsyntax ZSH color #b68 "\b[0-9]+([.][0-9]+)?\b"
+extendsyntax ZSH color #d92 "\<(always|break|bye|case|continue|disown|do|done|elif|else|esac|exit|fi|for|function|if|in|local|read|return|select|shift|then|time|until|while)\>"
+extendsyntax ZSH color #d92 "(\{|\}|\(|\)|\;|\]|\[|`|\\|\$|<|>|!|=|&|\|)"
+extendsyntax ZSH color #696 "-[Ldefgruwx]\>" "-(eq|ne|gt|lt|ge|le|s|n|z)\>"
+extendsyntax ZSH color #992 "\<((un)?alias|bindkey|builtin|cd|command|declare|eval|exec|export|jobs|let|popd|pushd|set|source|typeset|umask|unset)\>"
+extendsyntax ZSH color #992 "\<(add-zsh-hook|autoload|cdr|chdir|compinit|dirs|(dis|en)able|echotc|echoti|emulate|print|printf|prompt(init)?|(un)?setopt|zle|zmodload|zstyle|whence|zargs|zmv)\>"
+extendsyntax ZSH color #992 "\<((g|ig)?awk|find|diff|[a-z]{0,4}grep|kill|killall|[a-z]{0,4}less|make|pkill|sed|sudo|tar)\>"
+extendsyntax ZSH color #992 "\<(base(32|64)|basename|bat|cat|chmod|chown|cp|curl|date|docker|echo|eza|fd|git|jq|ln|ls|mkdir|mv|nano|printf|procs|pwd|rg|rm|rsync|ssh|starship|tail|tmux|touch|tree|true|false|uname|unzip|wget|whoami|zoxide)\>"
+extendsyntax ZSH icolor #992 "^[[:space:]]*(function[[:space:]]+)?[0-9A-Z_]+[[:space:]]*\(\)"
+extendsyntax ZSH icolor #edb "\$\{?[0-9A-Z_!@#$*?-]+\}?"
+extendsyntax ZSH color #d92 "\"(\\.|[^\"])*\"" "'(\\.|[^'])*'"
+extendsyntax ZSH color #987 "(^|[[:space:]])#.*$"
+extendsyntax ZSH color ,#c22 "[[:space:]]+$"
+
+## Python
+extendsyntax python color #edb ".*"
+extendsyntax python color #b68 "\<(None|True|False)\>"
+extendsyntax python icolor #b68 "\b(([1-9][0-9]+)|0+)([.][0-9]+)?\b" "\b0[xX][0-9a-f]+\b" "\b0[bB][01]+\b"
+extendsyntax python color #d92 "\<(and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|not|or|pass|raise|return|try|with|while|yield)\>"
+extendsyntax python color #d92 "[.:;,+*|=!?%<>/&-]" "[(){}]" "\[" "\]"
+extendsyntax python color #992 "def[[:space:]]+[a-zA-Z_][a-zA-Z_0-9]*"
+extendsyntax python color #8a9 "class[[:space:]]+[a-zA-Z_][a-zA-Z_0-9]*" "\<(bool|bytes|dict|float|int|list|object|set|str|tuple|type)\>"
+extendsyntax python color #696 "@[a-zA-Z_][a-zA-Z_0-9.]*"
+extendsyntax python color #d92 "['][^']*[^\\][']" "[\"][^\"]*[^\\][\"]"
+extendsyntax python color #987 start="\"\"\"" end="\"\"\"" start="'''" end="'''"
+extendsyntax python color #987 "^#.*|[[:space:]]#.*$"
+extendsyntax python color ,#c22 "[[:space:]]+$"
+
+## Rust
+extendsyntax Rust color #edb ".*"
+extendsyntax Rust color #d92 "\<(as|break|const|continue|crate|else|enum|extern|fn|for|if|impl|in|let|loop|match|mod|move|mut|pub|ref|return|self|static|struct|super|trait|type|unsafe|use|where|while)\>"
+extendsyntax Rust color #b68 "\<(true|false)\>" "\b[0-9]+([.][0-9]+)?\b"
+extendsyntax Rust color #992 "fn[[:space:]]+[a-z_][a-z0-9_]*" "[a-z_][a-z0-9_]*!"
+extendsyntax Rust color #8a9 "\<(bool|char|f32|f64|i8|i16|i32|i64|i128|isize|str|u8|u16|u32|u64|u128|usize)\>" "\<[A-Z][A-Za-z0-9_]*\>"
+extendsyntax Rust color #696 start="#\[" end="\]"
+extendsyntax Rust color #d92 "[+*/%=!<>&|^-]" "[(){}]" "\[" "\]"
+extendsyntax Rust color #d92 "\"(\\.|[^\"])*\""
+extendsyntax Rust color #987 "^[[:space:]]*//.*"
+extendsyntax Rust color #987 start="/\*" end="\*/"
+extendsyntax Rust color ,#c22 "[[:space:]]+$"
+
+## HTML
+extendsyntax HTML color #edb ".*"
+extendsyntax HTML color #992 start="</?[A-Za-z][^>]*" end=">"
+extendsyntax HTML color #696 "[[:space:]][A-Za-z_:][-A-Za-z0-9_:.]*="
+extendsyntax HTML color #d92 "\"(\\.|[^\"])*\"" "'(\\.|[^'])*'"
+extendsyntax HTML color #b68 "&#?[[:alnum:]]+;"
+extendsyntax HTML color #987 start="<!--" end="-->"
+extendsyntax HTML color ,#c22 "[[:space:]]+$"
+
+## Diff / Patch
+extendsyntax Patch color #edb ".*"
+extendsyntax Patch color #bb2 "^\+.*"
+extendsyntax Patch color #c22 "^-.*"
+extendsyntax Patch color #d92 "^@@.*" "^diff.*"

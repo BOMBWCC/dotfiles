@@ -1,0 +1,5 @@
+patch:
+  app_options/com.mitchellh.ghostty:
+    ascii_mode: true
+  app_options/com.org.tabby:
+    ascii_mode: true

@@ -1,0 +1,35 @@
+# Main Zsh entry point. Keep feature configuration in the modules below.
+
+ZSH_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+
+_source_zsh_config() {
+  [[ -r "$ZSH_CONFIG_DIR/$1" ]] && source "$ZSH_CONFIG_DIR/$1"
+}
+
+_source_zsh_config common/path.zsh
+_source_zsh_config common/editor.zsh
+_source_zsh_config common/history.zsh
+
+case "$OSTYPE" in
+  darwin*) _source_zsh_config platform/macos.zsh ;;
+  linux*)  _source_zsh_config platform/linux.zsh ;;
+esac
+
+_source_zsh_config plugins/zinit.zsh
+_source_zsh_config plugins/completion.zsh
+_source_zsh_config plugins/input.zsh
+
+# Machine-local values may override optional-module switches. Keep this file
+# outside dotfiles/Git because it can also contain secrets.
+[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+[[ "${ZSH_ENABLE_DEV:-0}" == 1 ]] && _source_zsh_config optional/dev.zsh
+[[ "${ZSH_ENABLE_AI:-0}" == 1 ]] && _source_zsh_config optional/ai.zsh
+
+_source_zsh_config tools/zoxide.zsh
+_source_zsh_config tools/starship.zsh
+_source_zsh_config tools/fastfetch.zsh
+_source_zsh_config tools/ripgrep.zsh
+_source_zsh_config common/aliases.zsh
+
+unset -f _source_zsh_config

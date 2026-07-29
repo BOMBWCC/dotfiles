@@ -1,0 +1,57 @@
+[user]
+	name = BOMBWCC
+	email = BOMBWCC@gmail.com
+
+[init]
+	defaultBranch = main
+
+[core]
+	excludesFile = ~/.config/git/ignore
+
+[interactive]
+	diffFilter = git-diff-pager --color-only
+
+[pager]
+	diff = git-diff-pager
+	log = git-diff-pager
+	reflog = git-diff-pager
+	show = git-diff-pager
+
+[diff]
+	algorithm = histogram
+	colorMoved = default
+
+[delta]
+	navigate = true
+	line-numbers = true
+	syntax-theme = bombwcc-gruvbox
+
+[fetch]
+	prune = true
+
+[pull]
+	ff = only
+
+[push]
+	autoSetupRemote = true
+
+{{ if eq .chezmoi.os "darwin" }}
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
+
+[commit]
+	template = {{ .chezmoi.homeDir }}/.stCommitMsg
+
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+
+[credential]
+	helper = osxkeychain
+{{ end }}

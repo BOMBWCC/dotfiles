@@ -1,0 +1,5 @@
+# bombwcc dotfiles: bat
+
+--theme="bombwcc-gruvbox"
+--style="numbers,changes,header"
+--paging=auto

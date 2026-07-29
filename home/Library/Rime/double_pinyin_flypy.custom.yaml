@@ -1,0 +1,6 @@
+patch:
+  # 始终默认使用半角模式
+  "switches/@1/reset": 0
+
+  # 中文输入状态下默认直接输出英文标点
+  "switches/@3/reset": 1

@@ -1,0 +1,33 @@
+# Theme
+
+theme = Gruvbox Dark Hard
+
+# Font
+
+font-family = MesloLGS Nerd Font Mono
+font-family = Noto Serif CJK SC
+font-size = 14
+font-thicken = true
+
+# Clipboard
+
+copy-on-select = clipboard
+
+# Cursor
+
+cursor-color = #d65d0e
+cursor-style = bar
+cursor-style-blink = true
+adjust-cursor-thickness = -1
+
+# Cursor shape and blinking are controlled by zsh-vi-mode. Ghostty also
+# prepares SSH sessions with its terminfo entry, falling back when necessary.
+shell-integration-features = no-cursor,ssh-env,ssh-terminfo
+
+# Window
+
+window-padding-x = 10
+window-padding-y = 8
+window-decoration = auto
+window-theme = dark
+quit-after-last-window-closed = false

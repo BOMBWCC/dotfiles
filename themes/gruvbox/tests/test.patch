@@ -1,0 +1,10 @@
+diff --git a/theme.txt b/theme.txt
+index 1111111..2222222 100644
+--- a/theme.txt
++++ b/theme.txt
+@@ -1,4 +1,4 @@
+ # Gruvbox colors
+-comment=#689d6a
++comment=#928374
+ string=#d79921
+ command=#98971a

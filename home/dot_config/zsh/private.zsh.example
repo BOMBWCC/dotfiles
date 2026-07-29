@@ -1,0 +1,8 @@
+# Copy this file to ~/.zshrc.local and fill in machine-local values.
+# Never commit the populated private file.
+
+# Optional modules. macOS enables both by default; Linux enables neither.
+# ZSH_ENABLE_DEV=1
+# ZSH_ENABLE_AI=1
+
+# export EXAMPLE_API_KEY=""

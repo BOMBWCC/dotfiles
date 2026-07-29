@@ -1,0 +1,11 @@
+# Search hidden files while continuing to respect ignore files.
+--hidden
+--smart-case
+--glob=!.git/*
+
+# Gruvbox-aligned output colors.
+--colors=path:fg:cyan
+--colors=line:fg:yellow
+--colors=column:fg:yellow
+--colors=match:fg:red
+--colors=match:style:bold

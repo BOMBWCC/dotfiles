@@ -1,0 +1,36 @@
+# ===== Editing =====
+
+set linenumbers
+set autoindent
+set tabsize 2
+set tabstospaces
+set smarthome
+set historylog
+set positionlog
+set minibar
+set stateflags
+set indicator
+unset mouse
+
+# ===== Gruvbox UI =====
+
+set titlecolor bold,#ebd,#282
+set minicolor bold,#fab,#282
+set statuscolor bold,#282,#d79
+set promptcolor bold,#ebd,#3c3
+set keycolor bold,#d79,normal
+set functioncolor #ebd,normal
+set numbercolor #928,normal
+set selectedcolor #282,#d79
+set spotlightcolor #282,#b8b
+set errorcolor bold,#fbf,#c33
+
+{{ if eq .chezmoi.os "darwin" -}}
+include "/opt/homebrew/opt/nanorc/share/nanorc/*.nanorc"
+{{ else if eq .chezmoi.os "linux" -}}
+include "/usr/share/nano/*.nanorc"
+{{ end -}}
+
+# Managed color overrides are rendered into the main file because GNU nano
+# does not allow `extendsyntax` inside an included syntax file.
+{{ template "bombwcc-gruvbox.nanorc.tmpl" . }}
