@@ -1,0 +1,55 @@
+# Operating-system metadata
+.DS_Store
+**/.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Editors and temporary files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.tmp
+*.temp
+*.bak
+*~
+.worktrees/
+
+# Logs, caches, and test output
+*.log
+.cache/
+coverage/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+
+# Local environment and machine state
+.env
+.env.*
+!.env.example
+!.env.sample
+.direnv/
+.zshrc.local
+.chezmoistate.*
+install-profile
+
+# Credentials and private keys
+auth.json
+credentials.json
+hosts.yml
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+known_hosts
+
+# Rime generated state, device identity, and personal dictionaries
+home/Library/Rime/build/
+home/Library/Rime/*.userdb/
+home/Library/Rime/installation.yaml
+home/Library/Rime/user.yaml
