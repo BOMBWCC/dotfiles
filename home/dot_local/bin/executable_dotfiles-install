@@ -1,0 +1,92 @@
+#!/bin/sh
+set -eu
+
+DRY_RUN=0
+OS_OVERRIDE=""
+
+BIN_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+LIB_DIR=$(CDPATH= cd -- "$BIN_DIR/../lib/bombwcc-dotfiles" && pwd)
+
+for module in \
+  common.sh \
+  installers/starship.sh \
+  installers/zoxide.sh \
+  installers/fastfetch.sh \
+  installers/uv.sh \
+  installers/fnm.sh \
+  installers/rustup.sh \
+  profiles/minimal.sh \
+  profiles/full.sh \
+  extensions/dev.sh \
+  extensions/ai.sh \
+  extensions/server.sh \
+  extensions/mac.sh
+do
+  # shellcheck source=/dev/null
+  . "$LIB_DIR/$module"
+done
+
+usage() {
+  cat <<'EOF'
+Usage:
+  dotfiles-install [--dry-run] [--os macos|linux] minimal
+  dotfiles-install [--dry-run] [--os macos|linux] full
+  dotfiles-install [--dry-run] [--os macos|linux] extension dev|ai|server|mac
+
+Profiles:
+  minimal       Shell and lightweight command-line tools
+  full          Minimal plus general-purpose terminal tools
+  extension     Optional development, AI, server, or macOS tools
+
+Rerun the same profile at any time to install tools added later.
+EOF
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --dry-run) DRY_RUN=1; shift ;;
+    --os)
+      [ "$#" -ge 2 ] || { usage >&2; exit 2; }
+      OS_OVERRIDE=$2
+      shift 2
+      ;;
+    --help|-h) usage; exit 0 ;;
+    *) break ;;
+  esac
+done
+
+case "$OS_OVERRIDE" in
+  ''|macos|linux) ;;
+  *) say "Unsupported --os value: $OS_OVERRIDE" >&2; exit 2 ;;
+esac
+
+[ "$#" -ge 1 ] || { usage >&2; exit 2; }
+COMMAND=$1
+shift
+OS_NAME=$(detect_os)
+
+case "$COMMAND" in
+  minimal)
+    [ "$#" -eq 0 ] || { usage >&2; exit 2; }
+    install_minimal
+    ;;
+  full)
+    [ "$#" -eq 0 ] || { usage >&2; exit 2; }
+    install_full
+    ;;
+  extension)
+    [ "$#" -eq 1 ] || { usage >&2; exit 2; }
+    case "$1" in
+      dev) install_extension_dev ;;
+      ai) install_extension_ai ;;
+      server) install_extension_server ;;
+      mac) install_extension_mac ;;
+      *) say "Unknown extension group: $1" >&2; usage >&2; exit 2 ;;
+    esac
+    ;;
+  *)
+    say "Unknown command: $COMMAND" >&2
+    usage >&2
+    exit 2
+    ;;
+esac

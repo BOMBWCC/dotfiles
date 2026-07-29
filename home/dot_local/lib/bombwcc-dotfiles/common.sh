@@ -1,0 +1,76 @@
+say() { printf '%s\n' "$*"; }
+
+run() {
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf '+ '
+    printf '%s ' "$@"
+    printf '\n'
+  else
+    "$@"
+  fi
+}
+
+run_shell() {
+  if [ "$DRY_RUN" -eq 1 ]; then
+    printf '+ sh -c %s\n' "$1"
+  else
+    sh -c "$1"
+  fi
+}
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+detect_os() {
+  if [ -n "$OS_OVERRIDE" ]; then
+    printf '%s\n' "$OS_OVERRIDE"
+    return
+  fi
+  case "$(uname -s)" in
+    Darwin) printf '%s\n' macos ;;
+    Linux) printf '%s\n' linux ;;
+    *) say "Unsupported operating system: $(uname -s)" >&2; exit 1 ;;
+  esac
+}
+
+as_root() {
+  if [ "$(id -u)" -eq 0 ]; then
+    run "$@"
+  elif have sudo || [ "$DRY_RUN" -eq 1 ]; then
+    run sudo "$@"
+  else
+    say "sudo is required: $*" >&2
+    exit 1
+  fi
+}
+
+ensure_homebrew() {
+  have brew && return
+  if [ "$DRY_RUN" -eq 1 ]; then
+    say '+ install Homebrew'
+    return
+  fi
+  say 'Installing Homebrew...'
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+}
+
+brew_formulae() { ensure_homebrew; run brew install "$@"; }
+brew_casks() { ensure_homebrew; run brew install --cask "$@"; }
+apt_update() { as_root apt-get update; }
+apt_packages() { as_root apt-get install -y "$@"; }
+
+apt_optional() {
+  for package in "$@"; do
+    if [ "$DRY_RUN" -eq 1 ]; then
+      as_root apt-get install -y "$package"
+    elif apt-cache show "$package" >/dev/null 2>&1; then
+      apt_packages "$package"
+    else
+      say "SKIP: $package is unavailable from this system's APT repositories."
+    fi
+  done
+}
