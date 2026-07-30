@@ -47,7 +47,7 @@ chsh -s "$(command -v zsh)"
 
 macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu/Debian 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。
 
-Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`、`zsh-vi-mode`、`fast-syntax-highlighting`，安装 fzf 后还会启用 `fzf-tab`。
+Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`和 `fast-syntax-highlighting`，安装 fzf 后还会启用 `fzf-tab`。
 
 ### `full`
 

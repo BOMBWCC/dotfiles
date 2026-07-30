@@ -20,8 +20,8 @@ cursor-style = bar
 cursor-style-blink = true
 adjust-cursor-thickness = -1
 
-# Cursor shape and blinking are controlled by zsh-vi-mode. Ghostty also
-# prepares SSH sessions with its terminfo entry, falling back when necessary.
+# Ghostty controls cursor shape and blinking. It also prepares SSH sessions
+# with its terminfo entry, falling back when necessary.
 shell-integration-features = no-cursor,ssh-env,ssh-terminfo
 
 # Window

@@ -10,9 +10,6 @@ for java_home in \
 done
 unset java_home
 
-# Use the macOS clipboard for zsh-vi-mode yank/delete operations.
-ZVM_SYSTEM_CLIPBOARD_ENABLED=true
-
 # Route SSH and Git authentication through the Bitwarden desktop SSH agent.
 # This is the macOS App Store socket; it contains no private key material.
 export SSH_AUTH_SOCK="$HOME/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock"
