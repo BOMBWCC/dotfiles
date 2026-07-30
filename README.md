@@ -43,18 +43,18 @@ chsh -s "$(command -v zsh)"
 | --- | --- |
 | Git、wget、Nano、jq、ripgrep | ca-certificates、Zsh、Git、curl、wget、unzip、Nano、jq、ripgrep、rsync、OpenSSH Client、tmux |
 | Starship、btop、fastfetch | Starship、zoxide、fastfetch |
-| eza、bat、fd、procs、zoxide | 仓库可用时安装 btop、bat、fd、eza、procs |
+| eza、bat、fd、procs、zoxide、fzf | 仓库可用时安装 btop、bat、fd、eza、procs、fzf |
 
 macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu/Debian 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。
 
-Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`和 `fast-syntax-highlighting`，安装 fzf 后还会启用 `fzf-tab`。
+Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`和 `fast-syntax-highlighting`；最小安装中的 fzf 可用时还会启用 `fzf-tab`。
 
 ### `full`
 
 `full` 总是先执行 `minimal`，再安装通用增强工具：
 
 ```text
-SQLite、7-Zip、yq、sd、fzf、broot、Yazi、lazygit、delta、GitHub CLI、
+SQLite、7-Zip、yq、sd、broot、Yazi、lazygit、delta、GitHub CLI、
 direnv、xh、gping、dog、mdcat、tealdeer、FFmpeg、yt-dlp
 ```
 

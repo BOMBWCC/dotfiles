@@ -50,12 +50,16 @@ assert_file "$LIB_ROOT/extensions/mac.sh"
 output=$(sh "$INSTALLER" --dry-run --os macos minimal 2>&1)
 assert_contains "$output" 'brew install'
 assert_contains "$output" 'btop'
+assert_contains "$output" 'fzf'
+assert_contains "$output" 'bat cache --build'
 assert_not_contains "$output" 'tmux'
 
 # Regression guarded: Linux minimal still includes tmux.
 output=$(sh "$INSTALLER" --dry-run --os linux minimal 2>&1)
 assert_contains "$output" 'apt-get install'
 assert_contains "$output" 'tmux'
+assert_contains "$output" 'fzf'
+assert_contains "$output" 'bat cache --build'
 
 # Regression guarded: full includes both minimum and full-only tools.
 output=$(sh "$INSTALLER" --dry-run --os macos full 2>&1)
