@@ -15,6 +15,7 @@ for module in \
   installers/uv.sh \
   installers/fnm.sh \
   installers/rustup.sh \
+  installers/oh-my-pi.sh \
   profiles/minimal.sh \
   profiles/full.sh \
   extensions/dev.sh \

@@ -45,6 +45,7 @@ assert_file "$LIB_ROOT/extensions/dev.sh"
 assert_file "$LIB_ROOT/extensions/ai.sh"
 assert_file "$LIB_ROOT/extensions/server.sh"
 assert_file "$LIB_ROOT/extensions/mac.sh"
+assert_file "$LIB_ROOT/installers/oh-my-pi.sh"
 
 # Regression guarded: macOS minimal must never install tmux.
 output=$(sh "$INSTALLER" --dry-run --os macos minimal 2>&1)
@@ -75,6 +76,8 @@ assert_not_contains "$output" 'codex'
 
 output=$(sh "$INSTALLER" --dry-run --os macos extension ai 2>&1)
 assert_contains "$output" '@openai/codex'
+assert_contains "$output" '@anthropic-ai/claude-code'
+assert_contains "$output" 'https://omp.sh/install'
 
 output=$(sh "$INSTALLER" --dry-run --os linux extension server 2>&1)
 assert_contains "$output" 'openssh-server'

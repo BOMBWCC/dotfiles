@@ -4,7 +4,8 @@ install_extension_ai() {
     exit 1
   fi
   run npm install -g @openai/codex @anthropic-ai/claude-code
+  install_oh_my_pi
   if [ "$OS_NAME" = macos ]; then brew_casks steipete/tap/codexbar; fi
-  say 'NOTE: Oh My Pi and CAUT remain manual until their verified package sources are recorded.'
   say 'NOTE: gh skill is supplied by a compatible GitHub CLI installation.'
+  say 'Open a new Zsh session, or run: exec zsh'
 }

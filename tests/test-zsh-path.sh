@@ -12,14 +12,18 @@ output=$(
         source "$1"
       }
       load_path_config "$1"
-      print -r -- "${path[1]}"
-      print -r -- "${path[2]}"
+      print -r -- "${(F)path}"
     ' zsh "$PATH_CONFIG"
 )
 
 expected=$(printf '%s\n' \
   '/tmp/bombwcc-path-test-home/bin' \
-  '/tmp/bombwcc-path-test-home/.local/bin')
+  '/tmp/bombwcc-path-test-home/.local/bin' \
+  '/tmp/bombwcc-path-test-home/.local/share/fnm' \
+  '/tmp/bombwcc-path-test-home/.cargo/bin' \
+  '/tmp/bombwcc-path-test-home/.bun/bin' \
+  '/usr/bin' \
+  '/bin')
 
 if [ "$output" != "$expected" ]; then
   printf 'FAIL: expected persistent user bin paths after function-scoped source\n' >&2

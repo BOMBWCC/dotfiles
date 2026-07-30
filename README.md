@@ -74,11 +74,11 @@ dotfiles-install extension mac
 | 扩展 | 平台 | 当前内容 |
 | --- | --- | --- |
 | `dev` | macOS、Ubuntu/Debian | Python、uv、fnm、Node.js LTS、Rust/Cargo、tree-sitter |
-| `ai` | macOS、Ubuntu/Debian | Codex CLI、Claude Code；macOS 另含 CodexBar |
+| `ai` | macOS、Ubuntu/Debian | Codex CLI、Claude Code、Oh My Pi；macOS 另含 CodexBar |
 | `server` | Ubuntu/Debian | OpenSSH Server、vnStat、fail2ban、UFW，以及仓库可用时的 Docker/Compose/Buildx |
 | `mac` | macOS | Ghostty、Docker Desktop、MesloLG Nerd Font、Noto Serif CJK SC、CodexBar、Squirrel/Rime |
 
-AI 扩展依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。服务器扩展只安装软件，不自动修改防火墙、SSH 端口或服务安全策略。
+AI 扩展中的 Codex CLI 和 Claude Code 依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。安装结束后重新打开 Zsh，或执行 `exec zsh`，即可加载 fnm 和用户命令目录。服务器扩展只安装软件，不自动修改防火墙、SSH 端口或服务安全策略。
 
 ## 安装器结构
 
