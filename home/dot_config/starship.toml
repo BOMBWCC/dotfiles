@@ -1,5 +1,9 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
+# Language runtimes can occasionally need more than Starship's default 500 ms
+# during a cold start (for example immediately after entering a project).
+command_timeout = 2000
+
 format = """
 [](color_orange)\
 $os\
