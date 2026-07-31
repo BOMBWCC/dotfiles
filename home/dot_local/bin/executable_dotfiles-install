@@ -16,6 +16,7 @@ for module in \
   installers/fnm.sh \
   installers/rustup.sh \
   installers/oh-my-pi.sh \
+  installers/codex-security.sh \
   profiles/minimal.sh \
   profiles/full.sh \
   extensions/dev.sh \

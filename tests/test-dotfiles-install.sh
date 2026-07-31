@@ -46,6 +46,7 @@ assert_file "$LIB_ROOT/extensions/ai.sh"
 assert_file "$LIB_ROOT/extensions/server.sh"
 assert_file "$LIB_ROOT/extensions/mac.sh"
 assert_file "$LIB_ROOT/installers/oh-my-pi.sh"
+assert_file "$LIB_ROOT/installers/codex-security.sh"
 
 # Regression guarded: macOS minimal must never install tmux.
 output=$(sh "$INSTALLER" --dry-run --os macos minimal 2>&1)
@@ -54,6 +55,7 @@ assert_contains "$output" 'btop'
 assert_contains "$output" 'fzf'
 assert_contains "$output" 'bat cache --build'
 assert_not_contains "$output" 'tmux'
+assert_not_contains "$output" '@openai/codex-security'
 
 # Regression guarded: Linux minimal still includes tmux.
 output=$(sh "$INSTALLER" --dry-run --os linux minimal 2>&1)
@@ -66,7 +68,11 @@ assert_contains "$output" 'bat cache --build'
 output=$(sh "$INSTALLER" --dry-run --os macos full 2>&1)
 assert_contains "$output" 'starship'
 assert_contains "$output" 'lazygit'
+assert_contains "$output" '@openai/codex-security'
 assert_not_contains "$output" 'tmux'
+
+output=$(sh "$INSTALLER" --dry-run --os linux full 2>&1)
+assert_contains "$output" '@openai/codex-security'
 
 # Regression guarded: extension groups remain opt-in.
 output=$(sh "$INSTALLER" --dry-run --os macos extension dev 2>&1)
