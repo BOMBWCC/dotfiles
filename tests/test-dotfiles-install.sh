@@ -68,6 +68,7 @@ assert_contains "$output" 'bat cache --build'
 output=$(sh "$INSTALLER" --dry-run --os macos full 2>&1)
 assert_contains "$output" 'starship'
 assert_contains "$output" 'lazygit'
+assert_contains "$output" 'doggo'
 assert_contains "$output" '@openai/codex-security'
 assert_not_contains "$output" 'tmux'
 
@@ -102,6 +103,23 @@ else
   assert_contains "$output" 'Unknown command: repair'
 fi
 assert_not_contains "$(cat "$INSTALLER")" 'install-profile'
+
+# Regression guarded: one unavailable optional Homebrew formula must not stop
+# later full-profile tools from being attempted.
+output=$(
+  sh -c '
+    . "$1"
+    DRY_RUN=0
+    brew() {
+      [ "$1" = install ] || return 0
+      [ "$2" = broken ] && return 1
+      printf "installed:%s\n" "$2"
+    }
+    brew_optional broken working
+  ' sh "$LIB_ROOT/common.sh" 2>&1 || true
+)
+assert_contains "$output" 'SKIP: Homebrew formula broken failed to install.'
+assert_contains "$output" 'installed:working'
 
 if [ "$failures" -ne 0 ]; then
   exit 1

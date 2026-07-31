@@ -8,6 +8,9 @@ output=$(
   HOME=/tmp/bombwcc-path-test-home \
     zsh -f -c '
       path=(/usr/bin /bin)
+      npm() {
+        [[ "$1 $2 $3" == "config get prefix" ]] && print -r -- "$HOME/.hermes/node"
+      }
       load_path_config() {
         source "$1"
       }
@@ -17,6 +20,7 @@ output=$(
 )
 
 expected=$(printf '%s\n' \
+  '/tmp/bombwcc-path-test-home/.hermes/node/bin' \
   '/tmp/bombwcc-path-test-home/bin' \
   '/tmp/bombwcc-path-test-home/.local/bin' \
   '/tmp/bombwcc-path-test-home/.local/share/fnm' \

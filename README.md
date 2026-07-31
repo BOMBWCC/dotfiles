@@ -55,7 +55,7 @@ Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插�
 
 ```text
 SQLite、7-Zip、yq、sd、broot、Yazi、lazygit、delta、GitHub CLI、
-direnv、xh、gping、dog、mdcat、tealdeer、FFmpeg、yt-dlp、Codex Security CLI
+direnv、xh、gping、doggo、mdcat、tealdeer、FFmpeg、yt-dlp、Codex Security CLI
 ```
 
 macOS 使用 Homebrew。Ubuntu/Debian 使用当前 APT 仓库；仓库中不存在的可选工具会显示 `SKIP`，不会阻断其他工具。Codex Security 会按需准备受支持的 Node.js 和 Python，再全局安装官方 `@openai/codex-security` 包。

@@ -60,6 +60,18 @@ ensure_homebrew() {
 
 brew_formulae() { ensure_homebrew; run brew install "$@"; }
 brew_casks() { ensure_homebrew; run brew install --cask "$@"; }
+
+brew_optional() {
+  ensure_homebrew
+  for formula in "$@"; do
+    if run brew install "$formula"; then
+      :
+    else
+      say "SKIP: Homebrew formula $formula failed to install."
+    fi
+  done
+}
+
 apt_update() { as_root apt-get update; }
 apt_packages() { as_root apt-get install -y "$@"; }
 

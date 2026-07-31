@@ -21,3 +21,11 @@ fi
 if [[ -d "$HOME/.npm-global/bin" ]]; then
   path=("$HOME/.npm-global/bin" $path)
 fi
+
+# npm may be provided by fnm, Hermes, or another user-level runtime. Include
+# its actual global binary directory instead of assuming a fixed prefix.
+if command -v npm >/dev/null 2>&1; then
+  npm_global_prefix="$(npm config get prefix 2>/dev/null)"
+  [[ -n "$npm_global_prefix" ]] && path=("$npm_global_prefix/bin" $path)
+  unset npm_global_prefix
+fi

@@ -1,6 +1,6 @@
 install_full_macos() {
   install_minimal_macos
-  brew_formulae sqlite sevenzip yq sd broot yazi lazygit git-delta gh direnv xh gping dog mdcat tealdeer ffmpeg yt-dlp
+  brew_optional sqlite sevenzip yq sd broot yazi lazygit git-delta gh direnv xh gping doggo mdcat tealdeer ffmpeg yt-dlp
   install_codex_security
 }
 
