@@ -1,5 +1,7 @@
 # Homebrew OpenJDK 17 (Apple Silicon and Intel prefixes).
 for java_home in \
+  /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
+  /usr/local/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home \
   /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home \
   /usr/local/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home; do
   if [[ -d "$java_home" ]]; then
