@@ -4,6 +4,28 @@ create_debian_command_links() {
   if have fdfind && ! have fd; then run ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"; fi
 }
 
+summary_manifest_minimal() {
+  summary_add 'Zsh' zsh --version
+  summary_add 'Git' git --version
+  summary_add 'curl' curl --version
+  summary_add 'wget' wget --version
+  summary_add 'Nano' nano --version
+  summary_add 'jq' jq --version
+  summary_add 'ripgrep' rg --version
+  summary_add 'rsync' rsync --version
+  summary_add 'OpenSSH Client' ssh -V
+  if [ "$OS_NAME" = linux ]; then summary_add 'tmux' tmux -V; fi
+  summary_add 'Starship' starship --version
+  summary_add 'btop' btop --version
+  summary_add 'fastfetch' fastfetch --version
+  summary_add 'eza' eza --version
+  summary_add 'bat' bat --version
+  summary_add 'fd' fd --version
+  summary_add 'procs' procs --version
+  summary_add 'zoxide' zoxide --version
+  summary_add 'fzf' fzf --version
+}
+
 rebuild_bat_cache() {
   if [ "$DRY_RUN" -eq 1 ] || have bat; then
     run bat cache --build

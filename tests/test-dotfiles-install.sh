@@ -134,6 +134,57 @@ assert_contains "$output" 'https://omp.sh/install'
 output=$(sh "$INSTALLER" --dry-run --os linux extension server 2>&1)
 assert_contains "$output" 'openssh-server'
 
+# Every Debian-supported profile and extension reports its command manifest.
+output=$(sh "$INSTALLER" --dry-run --os linux minimal 2>&1)
+assert_contains "$output" 'Installation summary'
+assert_contains "$output" 'Planned:'
+assert_contains "$output" '  - Zsh'
+assert_contains "$output" '  - fd'
+assert_contains "$output" '  - bat'
+assert_contains "$output" 'Installation completed.'
+
+output=$(sh "$INSTALLER" --dry-run --os linux full 2>&1)
+assert_contains "$output" '  - Zsh'
+assert_contains "$output" '  - SQLite'
+assert_contains "$output" '  - Codex Security'
+
+output=$(sh "$INSTALLER" --dry-run --os linux extension dev 2>&1)
+assert_contains "$output" '  - Python'
+assert_contains "$output" '  - uv'
+assert_contains "$output" '  - Node.js'
+
+output=$(sh "$INSTALLER" --dry-run --os linux extension ai 2>&1)
+assert_contains "$output" '  - Codex CLI'
+assert_contains "$output" '  - Claude Code'
+assert_contains "$output" '  - Oh My Pi'
+
+output=$(sh "$INSTALLER" --dry-run --os linux extension server 2>&1)
+assert_contains "$output" '  - OpenSSH Server'
+assert_contains "$output" '  - Docker'
+assert_contains "$output" 'docker-compose-v2'
+
+# A required-package failure retains the APT status and renders the failure
+# summary without contacting the network.
+failure_root="$test_tmp/failure-root"
+mkdir -p "$failure_root/bin" "$failure_root/lib" "$failure_root/fake-bin"
+cp "$INSTALLER" "$failure_root/bin/dotfiles-install"
+cp -R "$LIB_ROOT" "$failure_root/lib/bombwcc-dotfiles"
+printf '#!/bin/sh\nexit 23\n' > "$failure_root/fake-bin/apt-get"
+printf '#!/bin/sh\nexec "$@"\n' > "$failure_root/fake-bin/sudo"
+printf 'ID=debian\nVERSION_ID="12"\n' > "$failure_root/debian-release"
+chmod +x "$failure_root/fake-bin/apt-get" "$failure_root/fake-bin/sudo"
+
+if output=$(PATH="$failure_root/fake-bin:/usr/bin:/bin" \
+  DOTFILES_OS_RELEASE_FILE="$failure_root/debian-release" \
+  sh "$failure_root/bin/dotfiles-install" --os linux minimal 2>&1); then
+  printf 'FAIL: required APT failure unexpectedly succeeded\n' >&2
+  failures=$((failures + 1))
+else
+  status=$?
+  assert_equals "$status" 23
+  assert_contains "$output" 'Installation did not complete.'
+fi
+
 # Regression guarded: the macOS extension installs the Rime frontend.
 output=$(sh "$INSTALLER" --dry-run --os macos extension mac 2>&1)
 assert_contains "$output" 'squirrel'

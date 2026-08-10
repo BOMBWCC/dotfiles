@@ -1,3 +1,9 @@
+summary_manifest_ai() {
+  summary_add 'Codex CLI' codex --version
+  summary_add 'Claude Code' claude --version
+  summary_add 'Oh My Pi' omp --version
+}
+
 install_extension_ai() {
   if ! have npm && [ "$DRY_RUN" -eq 0 ]; then
     say 'Node.js/npm is required. Run: dotfiles-install extension dev' >&2

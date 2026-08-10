@@ -30,6 +30,13 @@ done
 
 summary_reset
 
+activate_summary() {
+  summary_reset
+  "$1"
+  SUMMARY_ACTIVE=1
+  trap summary_on_exit 0
+}
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -73,18 +80,20 @@ validate_platform
 case "$COMMAND" in
   minimal)
     [ "$#" -eq 0 ] || { usage >&2; exit 2; }
+    activate_summary summary_manifest_minimal
     install_minimal
     ;;
   full)
     [ "$#" -eq 0 ] || { usage >&2; exit 2; }
+    activate_summary summary_manifest_full
     install_full
     ;;
   extension)
     [ "$#" -eq 1 ] || { usage >&2; exit 2; }
     case "$1" in
-      dev) install_extension_dev ;;
-      ai) install_extension_ai ;;
-      server) install_extension_server ;;
+      dev) activate_summary summary_manifest_dev; install_extension_dev ;;
+      ai) activate_summary summary_manifest_ai; install_extension_ai ;;
+      server) activate_summary summary_manifest_server; install_extension_server ;;
       mac) install_extension_mac ;;
       *) say "Unknown extension group: $1" >&2; usage >&2; exit 2 ;;
     esac

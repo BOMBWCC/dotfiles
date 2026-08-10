@@ -1,3 +1,13 @@
+summary_manifest_dev() {
+  summary_add 'Python' python3 --version
+  summary_add 'uv' uv --version
+  summary_add 'fnm' fnm --version
+  summary_add 'Node.js' node --version
+  summary_add 'npm' npm --version
+  summary_add 'Rust/Cargo' cargo --version
+  summary_add 'tree-sitter' tree-sitter --version
+}
+
 install_extension_dev() {
   if [ "$OS_NAME" = macos ]; then
     brew_formulae python uv fnm rust tree-sitter

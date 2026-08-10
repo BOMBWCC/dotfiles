@@ -1,3 +1,11 @@
+summary_manifest_server() {
+  summary_add 'OpenSSH Server' /usr/sbin/sshd -V
+  summary_add 'vnStat' vnstat --version
+  summary_add 'fail2ban' fail2ban-client --version
+  summary_add 'UFW' ufw --version
+  summary_add 'Docker' docker --version
+}
+
 install_extension_server() {
   if [ "$OS_NAME" != linux ]; then
     say 'SKIP: the server extension only applies to Linux.'
