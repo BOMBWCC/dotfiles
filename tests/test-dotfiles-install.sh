@@ -119,6 +119,9 @@ assert_not_contains "$output" 'tmux'
 
 output=$(sh "$INSTALLER" --dry-run --os linux full 2>&1)
 assert_contains "$output" '@openai/codex-security'
+# Removing sd from install_full_linux's optional APT packages must fail this
+# behavior check even though sd remains present in the summary manifest.
+assert_contains "$output" 'apt-get install -y sd'
 
 # Regression guarded: extension groups remain opt-in.
 output=$(sh "$INSTALLER" --dry-run --os macos extension dev 2>&1)
@@ -135,6 +138,14 @@ output=$(sh "$INSTALLER" --dry-run --os linux extension server 2>&1)
 assert_contains "$output" 'openssh-server'
 assert_contains "$output" 'does not explicitly enable or start services or modify firewall rules'
 assert_contains "$output" 'Debian package defaults may still enable or start services.'
+
+# Activating the Linux-only server summary before its platform guard must fail:
+# unsupported macOS runs report only the skip, not a successful Linux plan.
+output=$(sh "$INSTALLER" --dry-run --os macos extension server 2>&1)
+assert_contains "$output" 'SKIP: the server extension only applies to Linux.'
+assert_not_contains "$output" 'Installation summary'
+assert_not_contains "$output" 'Planned:'
+assert_not_contains "$output" 'Installation completed.'
 
 # Every Debian-supported profile and extension reports its command manifest.
 output=$(sh "$INSTALLER" --dry-run --os linux minimal 2>&1)
@@ -223,7 +234,11 @@ assert_contains "$output" 'installed:working'
 fake_bin="$test_tmp/bin"
 mkdir -p "$fake_bin"
 printf '#!/bin/sh\nprintf "ready-tool 1.2.3\\n"\n' > "$fake_bin/ready-tool"
+printf '#!/bin/sh\nprintf "probe failed loudly\\n"\nexit 19\n' > "$fake_bin/failing-version"
+printf '#!/bin/sh\nawk '\''BEGIN { printf "noisy-tool 9.8.7 "; for (i = 0; i < 400; i++) printf "x"; printf "\\nignored detail\\n" }'\''\n' > "$fake_bin/noisy-version"
+printf '#!/bin/sh\ntrap '\''exit 141'\'' 13\ni=0\nwhile [ "$i" -lt 2000 ]; do\n  printf "streaming-noise-012345678901234567890123456789012345678901234567890123456789\\n"\n  i=$((i + 1))\ndone\n: > "$STREAM_MARKER"\n' > "$fake_bin/streaming-version"
 chmod +x "$fake_bin/ready-tool"
+chmod +x "$fake_bin/failing-version" "$fake_bin/noisy-version" "$fake_bin/streaming-version"
 
 output=$(
   PATH="$fake_bin:/usr/bin:/bin" sh -c '
@@ -241,6 +256,39 @@ assert_contains "$output" 'Ready Tool — ready-tool 1.2.3'
 assert_contains "$output" 'Missing:'
 assert_contains "$output" 'Missing Tool'
 assert_contains "$output" 'Installation completed.'
+
+# Treat version probes as best-effort metadata: a failing command contributes
+# no error text, and a successful but noisy command is bounded to one short line.
+output=$(
+  PATH="$fake_bin:/usr/bin:/bin" sh -c '. "$1"; summary_version failing-version --version' \
+    sh "$LIB_ROOT/common.sh"
+)
+assert_equals "$output" ''
+
+output=$(
+  PATH="$fake_bin:/usr/bin:/bin" sh -c '. "$1"; summary_version noisy-version --version' \
+    sh "$LIB_ROOT/common.sh"
+)
+assert_contains "$output" 'noisy-tool 9.8.7'
+assert_not_contains "$output" 'ignored detail'
+if [ "${#output}" -gt 200 ]; then
+  printf 'FAIL: expected noisy version output to be at most 200 characters, got %s\n' "${#output}" >&2
+  failures=$((failures + 1))
+fi
+
+# Draining a streaming probe to EOF must fail this check: once the summary has
+# enough metadata, it closes the stream and treats the interrupted probe as
+# unavailable rather than waiting for or displaying its unverified output.
+stream_marker="$test_tmp/stream-consumed"
+output=$(
+  PATH="$fake_bin:/usr/bin:/bin" STREAM_MARKER="$stream_marker" \
+    sh -c '. "$1"; summary_version streaming-version --version' sh "$LIB_ROOT/common.sh"
+)
+assert_equals "$output" ''
+if [ -e "$stream_marker" ]; then
+  printf 'FAIL: expected streaming version probe to stop before consuming its tail\n' >&2
+  failures=$((failures + 1))
+fi
 
 output=$(
   sh -c '. "$1"; DRY_RUN=1; summary_reset; summary_add "Git" git --version; summary_render 0' \

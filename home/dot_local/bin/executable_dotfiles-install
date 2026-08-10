@@ -93,7 +93,10 @@ case "$COMMAND" in
     case "$1" in
       dev) activate_summary summary_manifest_dev; install_extension_dev ;;
       ai) activate_summary summary_manifest_ai; install_extension_ai ;;
-      server) activate_summary summary_manifest_server; install_extension_server ;;
+      server)
+        if [ "$OS_NAME" = linux ]; then activate_summary summary_manifest_server; fi
+        install_extension_server
+        ;;
       mac) install_extension_mac ;;
       *) say "Unknown extension group: $1" >&2; usage >&2; exit 2 ;;
     esac

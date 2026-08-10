@@ -32,7 +32,7 @@ install_full_macos() {
 
 install_full_linux() {
   install_minimal_linux
-  apt_optional sqlite3 p7zip-full yq broot yazi lazygit git-delta gh direnv xh gping dog mdcat tealdeer ffmpeg yt-dlp
+  apt_optional sqlite3 p7zip-full yq sd broot yazi lazygit git-delta gh direnv xh gping dog mdcat tealdeer ffmpeg yt-dlp
   install_codex_security
   say 'NOTE: tools unavailable from APT are skipped and reported above.'
 }

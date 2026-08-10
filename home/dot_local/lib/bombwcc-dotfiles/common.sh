@@ -39,7 +39,22 @@ summary_version() {
   command_name=$1
   version_flag=$2
   [ -n "$version_flag" ] || return 0
-  "$command_name" "$version_flag" 2>&1 | sed -n '1p'
+
+  summary_status_file=$(mktemp "${TMPDIR:-/tmp}/dotfiles-summary-status.XXXXXX" 2>/dev/null) || return 0
+  version_output=$(
+    {
+      "$command_name" "$version_flag" 2>&1
+      printf '%s\n' "$?" > "$summary_status_file"
+    } | dd bs=1 count=200 2>/dev/null
+  )
+
+  summary_probe_status=""
+  if [ -r "$summary_status_file" ]; then
+    IFS= read -r summary_probe_status < "$summary_status_file" || summary_probe_status=""
+  fi
+  rm -f "$summary_status_file"
+  [ "$summary_probe_status" = 0 ] || return 0
+  printf '%s\n' "$version_output" | sed -n '1{p;q;}'
 }
 
 summary_render() {
