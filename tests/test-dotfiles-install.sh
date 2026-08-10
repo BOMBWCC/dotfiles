@@ -133,6 +133,8 @@ assert_contains "$output" 'https://omp.sh/install'
 
 output=$(sh "$INSTALLER" --dry-run --os linux extension server 2>&1)
 assert_contains "$output" 'openssh-server'
+assert_contains "$output" 'does not explicitly enable or start services or modify firewall rules'
+assert_contains "$output" 'Debian package defaults may still enable or start services.'
 
 # Every Debian-supported profile and extension reports its command manifest.
 output=$(sh "$INSTALLER" --dry-run --os linux minimal 2>&1)

@@ -14,5 +14,5 @@ install_extension_server() {
   apt_update
   apt_packages openssh-server vnstat fail2ban ufw
   apt_optional docker.io docker-compose-v2 docker-buildx
-  say 'NOTE: firewall rules and service enablement are intentionally not changed automatically.'
+  say 'NOTE: this installer does not explicitly enable or start services or modify firewall rules; Debian package defaults may still enable or start services.'
 }

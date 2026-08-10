@@ -78,7 +78,7 @@ dotfiles-install extension mac
 | `server` | Ubuntu 和 Debian 12 | OpenSSH Server、vnStat、fail2ban、UFW，以及仓库可用时的 Docker/Compose/Buildx |
 | `mac` | macOS | Ghostty、Docker Desktop、MesloLG Nerd Font、Noto Serif CJK SC、CodexBar、Squirrel/Rime |
 
-AI 扩展中的 Codex CLI 和 Claude Code 依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。安装结束后重新打开 Zsh，或执行 `exec zsh`，即可加载 fnm 和用户命令目录。服务器扩展只安装软件，不会启用服务，也不自动修改防火墙、SSH 端口或服务安全策略。
+AI 扩展中的 Codex CLI 和 Claude Code 依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。安装结束后重新打开 Zsh，或执行 `exec zsh`，即可加载 fnm 和用户命令目录。服务器扩展不会显式调用服务启用或启动命令，也不修改防火墙规则；但 Debian 软件包的默认行为仍可能启用或启动服务。
 
 ## 安装器结构
 
