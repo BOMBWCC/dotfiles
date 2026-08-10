@@ -28,6 +28,8 @@ do
   . "$LIB_DIR/$module"
 done
 
+summary_reset
+
 usage() {
   cat <<'EOF'
 Usage:

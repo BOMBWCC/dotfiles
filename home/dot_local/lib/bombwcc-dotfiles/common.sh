@@ -20,6 +20,68 @@ run_shell() {
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+summary_reset() {
+  SUMMARY_ITEMS=""
+  SUMMARY_ACTIVE=0
+}
+
+summary_add() {
+  record="$1|$2|${3:-}"
+  if [ -n "$SUMMARY_ITEMS" ]; then
+    SUMMARY_ITEMS="$SUMMARY_ITEMS
+$record"
+  else
+    SUMMARY_ITEMS=$record
+  fi
+}
+
+summary_version() {
+  command_name=$1
+  version_flag=$2
+  [ -n "$version_flag" ] || return 0
+  "$command_name" "$version_flag" 2>&1 | sed -n '1p'
+}
+
+summary_render() {
+  original_status=$1
+  [ -n "${SUMMARY_ITEMS:-}" ] || return 0
+  say ''
+  say 'Installation summary'
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    say 'Planned:'
+    printf '%s\n' "$SUMMARY_ITEMS" | while IFS='|' read -r label command_name version_flag; do
+      [ -n "$label" ] && say "  - $label"
+    done
+  else
+    say 'Ready:'
+    printf '%s\n' "$SUMMARY_ITEMS" | while IFS='|' read -r label command_name version_flag; do
+      if have "$command_name"; then
+        version=$(summary_version "$command_name" "$version_flag" || true)
+        if [ -n "$version" ]; then say "  - $label — $version"; else say "  - $label"; fi
+      fi
+    done
+    say 'Missing:'
+    printf '%s\n' "$SUMMARY_ITEMS" | while IFS='|' read -r label command_name version_flag; do
+      have "$command_name" || say "  - $label"
+    done
+  fi
+
+  if [ "$original_status" -eq 0 ]; then
+    say 'Installation completed.'
+  else
+    say 'Installation did not complete.'
+  fi
+}
+
+summary_on_exit() {
+  original_status=$?
+  trap - 0
+  set +e
+  if [ "${SUMMARY_ACTIVE:-0}" -eq 1 ]; then summary_render "$original_status"; fi
+  exit "$original_status"
+}
+
 detect_os() {
   if [ -n "$OS_OVERRIDE" ]; then
     printf '%s\n' "$OS_OVERRIDE"

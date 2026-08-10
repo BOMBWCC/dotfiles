@@ -166,6 +166,44 @@ output=$(
 assert_contains "$output" 'SKIP: Homebrew formula broken failed to install.'
 assert_contains "$output" 'installed:working'
 
+# Summary uses the command manifest to distinguish ready and missing tools.
+fake_bin="$test_tmp/bin"
+mkdir -p "$fake_bin"
+printf '#!/bin/sh\nprintf "ready-tool 1.2.3\\n"\n' > "$fake_bin/ready-tool"
+chmod +x "$fake_bin/ready-tool"
+
+output=$(
+  PATH="$fake_bin:/usr/bin:/bin" sh -c '
+    . "$1"
+    DRY_RUN=0
+    summary_reset
+    summary_add "Ready Tool" ready-tool --version
+    summary_add "Missing Tool" missing-tool --version
+    summary_render 0
+  ' sh "$LIB_ROOT/common.sh"
+)
+assert_contains "$output" 'Installation summary'
+assert_contains "$output" 'Ready:'
+assert_contains "$output" 'Ready Tool — ready-tool 1.2.3'
+assert_contains "$output" 'Missing:'
+assert_contains "$output" 'Missing Tool'
+assert_contains "$output" 'Installation completed.'
+
+output=$(
+  sh -c '. "$1"; DRY_RUN=1; summary_reset; summary_add "Git" git --version; summary_render 0' \
+    sh "$LIB_ROOT/common.sh"
+)
+assert_contains "$output" 'Planned:'
+assert_not_contains "$output" 'Ready:'
+
+if output=$(sh -c '. "$1"; DRY_RUN=0; summary_reset; summary_add "Git" git --version; summary_render 7; exit 7' \
+  sh "$LIB_ROOT/common.sh" 2>&1); then
+  printf 'FAIL: summary failure fixture unexpectedly succeeded\n' >&2
+  failures=$((failures + 1))
+else
+  assert_contains "$output" 'Installation did not complete.'
+fi
+
 if [ "$failures" -ne 0 ]; then
   exit 1
 fi
