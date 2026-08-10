@@ -32,6 +32,45 @@ detect_os() {
   esac
 }
 
+detect_linux_distro() {
+  release_file=${1:-${DOTFILES_OS_RELEASE_FILE:-/etc/os-release}}
+  [ -r "$release_file" ] || {
+    say "Unsupported Linux system: cannot read $release_file" >&2
+    return 1
+  }
+
+  DISTRO_NAME=""
+  DISTRO_VERSION=""
+  while IFS='=' read -r key value; do
+    value=${value#\"}
+    value=${value%\"}
+    case "$key" in
+      ID) DISTRO_NAME=$value ;;
+      VERSION_ID) DISTRO_VERSION=$value ;;
+    esac
+  done < "$release_file"
+
+  [ -n "$DISTRO_NAME" ] || {
+    say "Unsupported Linux system: ID is missing from $release_file" >&2
+    return 1
+  }
+}
+
+validate_platform() {
+  [ "$OS_NAME" = macos ] && return 0
+  if [ "$OS_NAME" = linux ] && [ "$OS_OVERRIDE" = linux ] && [ "$DRY_RUN" -eq 1 ]; then
+    DISTRO_NAME=apt-compatible
+    DISTRO_VERSION=""
+    return 0
+  fi
+  [ "$OS_NAME" = linux ] || return 0
+  detect_linux_distro || return 1
+  case "$DISTRO_NAME" in
+    debian|ubuntu) return 0 ;;
+    *) say "Unsupported Linux distribution: $DISTRO_NAME" >&2; return 1 ;;
+  esac
+}
+
 as_root() {
   if [ "$(id -u)" -eq 0 ]; then
     run "$@"

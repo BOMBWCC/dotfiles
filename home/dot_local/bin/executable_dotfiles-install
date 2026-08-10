@@ -66,6 +66,7 @@ esac
 COMMAND=$1
 shift
 OS_NAME=$(detect_os)
+validate_platform
 
 case "$COMMAND" in
   minimal)

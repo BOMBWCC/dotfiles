@@ -29,6 +29,15 @@ assert_not_contains() {
   esac
 }
 
+assert_equals() {
+  actual=$1
+  expected=$2
+  if [ "$actual" != "$expected" ]; then
+    printf 'FAIL: expected <%s>, got <%s>\n' "$expected" "$actual" >&2
+    failures=$((failures + 1))
+  fi
+}
+
 assert_file() {
   file=$1
   if [ ! -f "$file" ]; then
@@ -47,6 +56,42 @@ assert_file "$LIB_ROOT/extensions/server.sh"
 assert_file "$LIB_ROOT/extensions/mac.sh"
 assert_file "$LIB_ROOT/installers/oh-my-pi.sh"
 assert_file "$LIB_ROOT/installers/codex-security.sh"
+
+# Linux distribution detection accepts Debian and Ubuntu release metadata.
+# A missing detect_linux_distro implementation would make these assertions fail.
+test_tmp=$(mktemp -d)
+trap 'rm -rf "$test_tmp"' EXIT HUP INT TERM
+
+printf 'ID=debian\nVERSION_ID="12"\n' > "$test_tmp/debian-release"
+output=$(
+  sh -c '. "$1"; detect_linux_distro "$2"; printf "%s|%s\\n" "$DISTRO_NAME" "$DISTRO_VERSION"' \
+    sh "$LIB_ROOT/common.sh" "$test_tmp/debian-release"
+)
+assert_equals "$output" 'debian|12'
+
+printf 'ID=ubuntu\nVERSION_ID="24.04"\n' > "$test_tmp/ubuntu-release"
+output=$(
+  sh -c '. "$1"; detect_linux_distro "$2"; printf "%s|%s\\n" "$DISTRO_NAME" "$DISTRO_VERSION"' \
+    sh "$LIB_ROOT/common.sh" "$test_tmp/ubuntu-release"
+)
+assert_equals "$output" 'ubuntu|24.04'
+
+# Linux in a real run validates the detected distribution even when --os linux
+# is present. This fixture keeps that boundary test independent of the host.
+output=$(
+  sh -c '. "$1"; DRY_RUN=0; OS_NAME=linux; OS_OVERRIDE=linux; DOTFILES_OS_RELEASE_FILE=$2; validate_platform; printf "%s|%s\\n" "$DISTRO_NAME" "$DISTRO_VERSION"' \
+    sh "$LIB_ROOT/common.sh" "$test_tmp/debian-release"
+)
+assert_equals "$output" 'debian|12'
+
+printf 'ID=fedora\nVERSION_ID="42"\n' > "$test_tmp/fedora-release"
+if output=$(sh -c '. "$1"; DRY_RUN=0; OS_NAME=linux; OS_OVERRIDE=""; DOTFILES_OS_RELEASE_FILE=$2; validate_platform' \
+  sh "$LIB_ROOT/common.sh" "$test_tmp/fedora-release" 2>&1); then
+  printf 'FAIL: Fedora platform validation unexpectedly succeeded\n' >&2
+  failures=$((failures + 1))
+else
+  assert_contains "$output" 'Unsupported Linux distribution: fedora'
+fi
 
 # Regression guarded: macOS minimal must never install tmux.
 output=$(sh "$INSTALLER" --dry-run --os macos minimal 2>&1)
