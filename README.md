@@ -1,6 +1,6 @@
 # bombwcc/dotfiles
 
-使用 [Chezmoi](https://www.chezmoi.io/) 管理的个人终端配置，支持 macOS 与 Ubuntu/Debian。核心环境保持轻量，开发语言、AI Agent、服务器服务和 macOS 应用通过扩展按需安装。
+使用 [Chezmoi](https://www.chezmoi.io/) 管理的个人终端配置，支持 macOS、Ubuntu 和 Debian 12。Linux 安装器会读取 `/etc/os-release`；其他 Linux 发行版会在修改软件包前明确退出。核心环境保持轻量，开发语言、AI Agent、服务器服务和 macOS 应用通过扩展按需安装。
 
 ## 快速开始
 
@@ -39,13 +39,13 @@ chsh -s "$(command -v zsh)"
 
 面向低配 VPS 和新机器的最小可用 Shell 环境。
 
-| macOS | Ubuntu/Debian |
+| macOS | Ubuntu 和 Debian 12 |
 | --- | --- |
 | Git、wget、Nano、jq、ripgrep | ca-certificates、Zsh、Git、curl、wget、unzip、Nano、jq、ripgrep、rsync、OpenSSH Client、tmux |
 | Starship、btop、fastfetch | Starship、zoxide、fastfetch |
 | eza、bat、fd、procs、zoxide、fzf | 仓库可用时安装 btop、bat、fd、eza、procs、fzf |
 
-macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu/Debian 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。
+macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu 和 Debian 12 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。Debian 12 只使用已经配置的 APT 仓库；不会添加 backports 或第三方软件源。仓库中没有的可选软件包会显示 `SKIP`，不会阻断其他安装步骤。
 
 Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`和 `fast-syntax-highlighting`；最小安装中的 fzf 可用时还会启用 `fzf-tab`。
 
@@ -58,7 +58,7 @@ SQLite、7-Zip、yq、sd、broot、Yazi、lazygit、delta、GitHub CLI、
 direnv、xh、gping、doggo、mdcat、tealdeer、FFmpeg、yt-dlp、Codex Security CLI
 ```
 
-macOS 使用 Homebrew。Ubuntu/Debian 使用当前 APT 仓库；仓库中不存在的可选工具会显示 `SKIP`，不会阻断其他工具。Codex Security 会按需准备受支持的 Node.js 和 Python，再全局安装官方 `@openai/codex-security` 包。
+macOS 使用 Homebrew。Ubuntu 和 Debian 12 使用当前 APT 仓库；仓库中不存在的可选工具会显示 `SKIP`，不会阻断其他工具。Codex Security 会按需准备受支持的 Node.js 和 Python，再全局安装官方 `@openai/codex-security` 包。
 
 ### `extension`
 
@@ -73,12 +73,12 @@ dotfiles-install extension mac
 
 | 扩展 | 平台 | 当前内容 |
 | --- | --- | --- |
-| `dev` | macOS、Ubuntu/Debian | Python、uv、fnm、Node.js LTS、Rust/Cargo、tree-sitter |
-| `ai` | macOS、Ubuntu/Debian | Codex CLI、Claude Code、Oh My Pi；macOS 另含 CodexBar |
-| `server` | Ubuntu/Debian | OpenSSH Server、vnStat、fail2ban、UFW，以及仓库可用时的 Docker/Compose/Buildx |
+| `dev` | macOS、Ubuntu 和 Debian 12 | Python、uv、fnm、Node.js LTS、Rust/Cargo、tree-sitter |
+| `ai` | macOS、Ubuntu 和 Debian 12 | Codex CLI、Claude Code、Oh My Pi；macOS 另含 CodexBar |
+| `server` | Ubuntu 和 Debian 12 | OpenSSH Server、vnStat、fail2ban、UFW，以及仓库可用时的 Docker/Compose/Buildx |
 | `mac` | macOS | Ghostty、Docker Desktop、MesloLG Nerd Font、Noto Serif CJK SC、CodexBar、Squirrel/Rime |
 
-AI 扩展中的 Codex CLI 和 Claude Code 依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。安装结束后重新打开 Zsh，或执行 `exec zsh`，即可加载 fnm 和用户命令目录。服务器扩展只安装软件，不自动修改防火墙、SSH 端口或服务安全策略。
+AI 扩展中的 Codex CLI 和 Claude Code 依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。安装结束后重新打开 Zsh，或执行 `exec zsh`，即可加载 fnm 和用户命令目录。服务器扩展只安装软件，不会启用服务，也不自动修改防火墙、SSH 端口或服务安全策略。
 
 ## 安装器结构
 
@@ -101,6 +101,15 @@ Chezmoi 将安装器应用到：
 - 开发、AI、服务器及 macOS 专属内容：对应 extension。
 
 一个工具只保留一个主要安装来源，避免与 Zinit、APT、Homebrew 重复安装。
+
+安装结束时会输出英文状态摘要，含义如下：
+
+```text
+Ready    command is available after the run
+Missing  command is still unavailable
+Planned  dry-run installation plan; no readiness claim
+SKIP     optional package or platform action was not performed
+```
 
 ## 管理配置
 
@@ -156,6 +165,10 @@ Ghostty 会包装交互式 `ssh`，首次连接时给缺少 `xterm-ghostty` 的�
 ```sh
 sh tests/test-dotfiles-install.sh
 sh tests/test-git-pager.sh
+sh tests/test-nano-config.sh
+
+# 需要 Docker 和网络访问
+sh tests/test-debian-12-install.sh
 
 # 检查安装计划
 dotfiles-install --dry-run --os macos full
