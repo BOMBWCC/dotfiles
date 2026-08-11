@@ -74,7 +74,7 @@ dotfiles-install extension mac
 | 扩展 | 平台 | 当前内容 |
 | --- | --- | --- |
 | `dev` | macOS、Ubuntu 和 Debian 12 | Python、uv、fnm、Node.js LTS、Rust/Cargo、tree-sitter |
-| `ai` | macOS、Ubuntu 和 Debian 12 | Codex CLI、Claude Code、Oh My Pi；macOS 另含 CodexBar |
+| `ai` | macOS、Ubuntu 和 Debian 12 | Codex CLI、Claude Code、Oh My Pi、Herdr；macOS 另含 CodexBar |
 | `server` | Ubuntu 和 Debian 12 | OpenSSH Server、vnStat、fail2ban、UFW，以及仓库可用时的 Docker/Compose/Buildx |
 | `mac` | macOS | Ghostty、Docker Desktop、MesloLG Nerd Font、Noto Serif CJK SC、CodexBar、Squirrel/Rime |
 

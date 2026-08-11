@@ -56,6 +56,7 @@ assert_file "$LIB_ROOT/extensions/server.sh"
 assert_file "$LIB_ROOT/extensions/mac.sh"
 assert_file "$LIB_ROOT/installers/oh-my-pi.sh"
 assert_file "$LIB_ROOT/installers/codex-security.sh"
+assert_file "$LIB_ROOT/installers/herdr.sh"
 
 # Linux distribution detection accepts Debian and Ubuntu release metadata.
 # A missing detect_linux_distro implementation would make these assertions fail.
@@ -133,6 +134,10 @@ output=$(sh "$INSTALLER" --dry-run --os macos extension ai 2>&1)
 assert_contains "$output" '@openai/codex'
 assert_contains "$output" '@anthropic-ai/claude-code'
 assert_contains "$output" 'https://omp.sh/install'
+assert_contains "$output" 'brew install herdr'
+
+output=$(sh "$INSTALLER" --dry-run --os linux extension ai 2>&1)
+assert_contains "$output" 'https://herdr.dev/install.sh'
 
 output=$(sh "$INSTALLER" --dry-run --os linux extension server 2>&1)
 assert_contains "$output" 'openssh-server'
@@ -170,6 +175,7 @@ output=$(sh "$INSTALLER" --dry-run --os linux extension ai 2>&1)
 assert_contains "$output" '  - Codex CLI'
 assert_contains "$output" '  - Claude Code'
 assert_contains "$output" '  - Oh My Pi'
+assert_contains "$output" '  - Herdr'
 
 output=$(sh "$INSTALLER" --dry-run --os linux extension server 2>&1)
 assert_contains "$output" '  - OpenSSH Server'

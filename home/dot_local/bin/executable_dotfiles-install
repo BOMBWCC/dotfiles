@@ -17,6 +17,7 @@ for module in \
   installers/rustup.sh \
   installers/oh-my-pi.sh \
   installers/codex-security.sh \
+  installers/herdr.sh \
   profiles/minimal.sh \
   profiles/full.sh \
   extensions/dev.sh \
