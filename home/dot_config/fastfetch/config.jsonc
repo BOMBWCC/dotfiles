@@ -38,6 +38,14 @@
     "poweradapter",
     "locale",
     "break",
+
+    {
+      "type": "weather",
+      "key": "Weather",
+      "location": "Chongqing",
+      "timeout": 3000,
+      "outputFormat": "%c+%t"
+    },
     {
     "type": "datetime",
     "format": "{year}-{month-pretty}-{day-pretty} {hour-pretty}:{minute-pretty} {timezone-name}"
