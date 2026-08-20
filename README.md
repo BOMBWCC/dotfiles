@@ -124,6 +124,11 @@ chezmoi cd         # 进入本地源仓库
 
 主要配置包括 Zsh、Git、Starship、tmux、Nano、ripgrep、bat、btop、fastfetch、Ghostty 和 macOS Rime。
 
+Fastfetch 还会显示以下联网信息：
+
+- `Weather`：使用 Fastfetch 内置天气模块查询重庆天气，数据来自 `wttr.in`；服务不可达或请求超时时会跳过显示。
+- `GitHub`：通过 `github-pulse-topaz.vercel.app` 查询 `bombwcc` 的 GitHub 活跃状态，并显示状态、BPM 和本周活动量。
+
 ### 本机私有配置
 
 机器差异和敏感环境变量放入未纳入 Git 的：
@@ -147,6 +152,8 @@ macOS Ghostty 配置位于：
 ```text
 ~/.config/ghostty/config.ghostty
 ```
+
+终端主字体为 `MesloLGS Nerd Font Mono`，用于英文、代码和 Nerd Font 图标；中文回退字体为 `Noto Serif CJK SC`，字号为 `14`。字体随 `mac` 扩展安装。
 
 配置启用了：
 

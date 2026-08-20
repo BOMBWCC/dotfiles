@@ -40,6 +40,12 @@
     "break",
 
     {
+      "type": "command",
+      "key": "󰊤 GitHub",
+      "text": "curl -s 'https://github-pulse-topaz.vercel.app/api/u/bombwcc' | jq -r '\"\\(.state | ascii_upcase) · \\(.bpm) BPM · \\(.weekly) this week\"'"
+    },
+
+    {
       "type": "weather",
       "key": "Weather",
       "location": "Chongqing",
