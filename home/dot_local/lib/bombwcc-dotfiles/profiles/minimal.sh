@@ -40,7 +40,8 @@ install_minimal_macos() {
 install_minimal_linux() {
   apt_update
   apt_packages ca-certificates zsh git curl wget unzip nano jq ripgrep rsync openssh-client tmux
-  apt_optional btop bat fd-find eza procs fzf
+  apt_optional btop bat fd-find procs fzf
+  install_eza_linux
   create_debian_command_links
   rebuild_bat_cache
   install_starship_linux

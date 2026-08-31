@@ -45,7 +45,7 @@ chsh -s "$(command -v zsh)"
 | Starship、btop、fastfetch | Starship、zoxide、fastfetch |
 | eza、bat、fd、procs、zoxide、fzf | 仓库可用时安装 btop、bat、fd、eza、procs、fzf |
 
-macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu 和 Debian 12 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。Debian 12 只使用已经配置的 APT 仓库；不会添加 backports 或第三方软件源。仓库中没有的可选软件包会显示 `SKIP`，不会阻断其他安装步骤。
+macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu 和 Debian 12 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。Debian 12 默认只使用已经配置的 APT 仓库；不会添加 backports 或第三方软件源。若 APT 没有 `eza`，安装器会回退到 eza 官方 GitHub Release 二进制；其他仓库中没有的可选软件包会显示 `SKIP`，不会阻断其他安装步骤。
 
 Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`和 `fast-syntax-highlighting`；最小安装中的 fzf 可用时还会启用 `fzf-tab`。
 
@@ -76,7 +76,7 @@ dotfiles-install extension mac
 | `dev` | macOS、Ubuntu 和 Debian 12 | Python、uv、fnm、Node.js LTS、Rust/Cargo、tree-sitter |
 | `ai` | macOS、Ubuntu 和 Debian 12 | Codex CLI、Claude Code、Oh My Pi、Herdr；macOS 另含 CodexBar |
 | `server` | Ubuntu 和 Debian 12 | OpenSSH Server、vnStat、fail2ban、UFW，以及仓库可用时的 Docker/Compose/Buildx |
-| `mac` | macOS | Ghostty、Docker Desktop、MesloLG Nerd Font、Noto Serif CJK SC、CodexBar、Squirrel/Rime |
+| `mac` | macOS | CLIamp、Ghostty、Docker Desktop、MesloLG Nerd Font、Noto Serif CJK SC、CodexBar、Squirrel/Rime |
 
 AI 扩展中的 Codex CLI 和 Claude Code 依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。安装结束后重新打开 Zsh，或执行 `exec zsh`，即可加载 fnm 和用户命令目录。服务器扩展不会显式调用服务启用或启动命令，也不修改防火墙规则；但 Debian 软件包的默认行为仍可能启用或启动服务。
 

@@ -57,6 +57,7 @@ assert_file "$LIB_ROOT/extensions/mac.sh"
 assert_file "$LIB_ROOT/installers/oh-my-pi.sh"
 assert_file "$LIB_ROOT/installers/codex-security.sh"
 assert_file "$LIB_ROOT/installers/herdr.sh"
+assert_file "$LIB_ROOT/installers/eza.sh"
 
 # Linux distribution detection accepts Debian and Ubuntu release metadata.
 # A missing detect_linux_distro implementation would make these assertions fail.
@@ -109,6 +110,7 @@ assert_contains "$output" 'apt-get install'
 assert_contains "$output" 'tmux'
 assert_contains "$output" 'fzf'
 assert_contains "$output" 'bat cache --build'
+assert_contains "$output" 'official eza release'
 
 # Regression guarded: full includes both minimum and full-only tools.
 output=$(sh "$INSTALLER" --dry-run --os macos full 2>&1)
@@ -209,6 +211,12 @@ output=$(sh "$INSTALLER" --dry-run --os macos extension mac 2>&1)
 assert_contains "$output" 'squirrel'
 assert_contains "$output" 'font-meslo-lg-nerd-font'
 assert_contains "$output" 'font-noto-serif-cjk-sc'
+assert_contains "$output" 'brew install bjarneo/cliamp/cliamp'
+
+# The macOS extension must not attempt to install cliamp on Linux.
+output=$(sh "$INSTALLER" --dry-run --os linux extension mac 2>&1)
+assert_contains "$output" 'SKIP: the mac extension only applies to macOS.'
+assert_not_contains "$output" 'cliamp'
 
 # Regression guarded: repair/profile state was removed; rerun a profile instead.
 if output=$(sh "$INSTALLER" --dry-run --os macos repair 2>&1); then

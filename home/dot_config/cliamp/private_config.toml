@@ -1,0 +1,10 @@
+theme = ""
+
+shuffle = true
+eq_preset = "Rock"
+eq = [5, 4, 2, -1, -2, 2, 4, 5, 5, 5]
+visualizer = "Wave"
+
+[spotify]
+client_id = "0048e50bd2554c51bf283a8c8c5fe5bd"
+bitrate = 320

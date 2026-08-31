@@ -11,6 +11,7 @@ for module in \
   common.sh \
   installers/starship.sh \
   installers/zoxide.sh \
+  installers/eza.sh \
   installers/fastfetch.sh \
   installers/uv.sh \
   installers/fnm.sh \
