@@ -24,6 +24,7 @@ summary_manifest_minimal() {
   summary_add 'procs' procs --version
   summary_add 'zoxide' zoxide --version
   summary_add 'fzf' fzf --version
+  summary_add 'Atuin' atuin --version
 }
 
 rebuild_bat_cache() {
@@ -33,7 +34,7 @@ rebuild_bat_cache() {
 }
 
 install_minimal_macos() {
-  brew_formulae git wget nano jq ripgrep starship btop fastfetch eza bat fd procs zoxide fzf
+  brew_formulae git wget nano jq ripgrep starship btop fastfetch eza bat fd procs zoxide fzf atuin
   rebuild_bat_cache
 }
 
@@ -46,6 +47,7 @@ install_minimal_linux() {
   rebuild_bat_cache
   install_starship_linux
   install_zoxide_linux
+  install_atuin_linux
   install_fastfetch_linux
 }
 

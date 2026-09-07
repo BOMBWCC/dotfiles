@@ -47,7 +47,9 @@ chsh -s "$(command -v zsh)"
 
 macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu 和 Debian 12 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。Debian 12 默认只使用已经配置的 APT 仓库；不会添加 backports 或第三方软件源。若 APT 没有 `eza`，安装器会回退到 eza 官方 GitHub Release 二进制；其他仓库中没有的可选软件包会显示 `SKIP`，不会阻断其他安装步骤。
 
-Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`和 `fast-syntax-highlighting`；最小安装中的 fzf 可用时还会启用 `fzf-tab`。
+Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`、`zsh-autosuggestions` 和 `fast-syntax-highlighting`；最小安装中的 fzf 可用时还会启用 `fzf-tab`。
+
+最小安装也包含 Atuin：macOS 通过 Homebrew 安装，Linux 通过官方发行版安装脚本安装到 `~/.local/bin`。输入时的灰色建议由 `zsh-autosuggestions` 提供，按右方向键接受；按 `Ctrl-R` 打开 Atuin 历史搜索，上方向键保留原来的行为。历史同步需要单独登录 Atuin 账号。
 
 ### `full`
 
@@ -128,6 +130,20 @@ Fastfetch 还会显示以下联网信息：
 
 - `Weather`：使用 Fastfetch 内置天气模块查询重庆天气，数据来自 `wttr.in`；服务不可达或请求超时时会跳过显示。
 - `GitHub`：通过 `github-pulse-topaz.vercel.app` 查询 `bombwcc` 的 GitHub 活跃状态，并显示状态、BPM 和本周活动量。
+
+### 常用 Zsh 别名
+
+这些别名会在对应工具已安装时自动启用：
+
+```text
+ls    = eza    # 替代 ls
+ll    = eza    # 替代 ls -la
+la    = eza    # 替代 ls -a
+tree  = eza    # 替代 tree
+cat   = bat    # 替代 cat
+less  = bat    # 替代 less
+psa   = procs  # procs 快捷命令
+```
 
 ### 本机私有配置
 
