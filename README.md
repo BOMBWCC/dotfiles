@@ -45,7 +45,7 @@ chsh -s "$(command -v zsh)"
 | Starship、btop、fastfetch | Starship、zoxide、fastfetch |
 | eza、bat、fd、procs、zoxide、fzf | 仓库可用时安装 btop、bat、fd、eza、procs、fzf |
 
-macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu 和 Debian 12 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。Debian 12 默认只使用已经配置的 APT 仓库；不会添加 backports 或第三方软件源。若 APT 没有 `eza`，安装器会回退到 eza 官方 GitHub Release 二进制；其他仓库中没有的可选软件包会显示 `SKIP`，不会阻断其他安装步骤。
+macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu 和 Debian 12 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。Debian 12 默认只使用已经配置的 APT 仓库；不会添加 backports 或第三方软件源。若 APT 没有 `eza` 或 `fastfetch`，安装器会回退到官方 GitHub Release，并先用 GitHub 公布的 SHA-256 校验下载内容；其他仓库中没有的可选软件包会显示 `SKIP`，不会阻断其他安装步骤。
 
 Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`、`zsh-autosuggestions` 和 `fast-syntax-highlighting`；最小安装中的 fzf 可用时还会启用 `fzf-tab`。
 
@@ -82,6 +82,8 @@ dotfiles-install extension mac
 
 AI 扩展中的 Codex CLI 和 Claude Code 依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。安装结束后重新打开 Zsh，或执行 `exec zsh`，即可加载 fnm 和用户命令目录。服务器扩展不会显式调用服务启用或启动命令，也不修改防火墙规则；但 Debian 软件包的默认行为仍可能启用或启动服务。
 
+服务器扩展会在安装 `openssh-server` 之前写入 `/etc/ssh/sshd_config.d/10-bombwcc-hardening.conf`，禁用 SSH 密码登录（`PasswordAuthentication no`、`PermitRootLogin prohibit-password`），这样软件包自动启动的 sshd 一开始就只接受密钥登录。为避免把自己锁在门外，只有当前账号的 `~/.ssh/authorized_keys` 中已有公钥时才会写入，否则只给出警告；设置 `DOTFILES_SKIP_SSH_HARDENING=1` 可跳过这一步。若 sshd 之前已在运行，需执行 `sudo systemctl reload ssh` 生效。UFW 只安装不启用；启用前先放行 SSH。注意 Docker 发布的端口会绕过 UFW 规则，不需要公开的端口应绑定到 `127.0.0.1`。
+
 ## 安装器结构
 
 Chezmoi 将安装器应用到：
@@ -100,6 +102,8 @@ Chezmoi 将安装器应用到：
 - 普通 CLI：APT 或 Homebrew；
 - Zsh 插件：Zinit；
 - 系统仓库不适合的工具：`installers/` 中的官方脚本或 GitHub Release；
+  - GitHub Release 资产（eza、fastfetch、zoxide、Atuin 安装脚本）必须与 GitHub 公布的 SHA-256 一致才会安装，否则显示 `SKIP`；
+  - 官方安装脚本会先完整下载到临时文件再执行，下载中断时不会执行半截脚本；
 - 开发、AI、服务器及 macOS 专属内容：对应 extension。
 
 一个工具只保留一个主要安装来源，避免与 Zinit、APT、Homebrew 重复安装。
@@ -129,7 +133,7 @@ chezmoi cd         # 进入本地源仓库
 Fastfetch 还会显示以下联网信息：
 
 - `Weather`：使用 Fastfetch 内置天气模块查询重庆天气，数据来自 `wttr.in`；服务不可达或请求超时时会跳过显示。
-- `GitHub`：通过 `github-pulse-topaz.vercel.app` 查询 `bombwcc` 的 GitHub 活跃状态，并显示状态、BPM 和本周活动量。
+- `GitHub`：通过 `github-pulse-topaz.vercel.app` 查询 `bombwcc` 的 GitHub 活跃状态，并显示状态、BPM 和本周活动量；请求最多等待 2 秒，返回内容中的控制字符会被过滤，避免第三方服务向终端注入转义序列。
 
 ### 常用 Zsh 别名
 

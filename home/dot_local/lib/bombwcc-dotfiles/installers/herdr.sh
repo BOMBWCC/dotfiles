@@ -7,6 +7,6 @@ install_herdr() {
   if [ "$OS_NAME" = macos ]; then
     brew_formulae herdr
   else
-    run_shell 'curl -fsSL https://herdr.dev/install.sh | sh'
+    run_remote_script https://herdr.dev/install.sh sh
   fi
 }
