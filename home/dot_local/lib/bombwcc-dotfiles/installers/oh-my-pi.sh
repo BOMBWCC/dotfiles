@@ -4,5 +4,5 @@ install_oh_my_pi() {
     return
   fi
 
-  run_shell 'curl -fsSL https://omp.sh/install | sh'
+  run_remote_script https://omp.sh/install sh
 }

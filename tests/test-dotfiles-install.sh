@@ -206,6 +206,47 @@ else
   assert_contains "$output" 'Installation did not complete.'
 fi
 
+# Remote installer scripts are downloaded completely before they run, so a
+# transfer that fails part-way must not execute anything.
+remote_root="$test_tmp/remote"
+mkdir -p "$remote_root/bin"
+printf '#!/bin/sh\nwhile [ "$#" -gt 0 ]; do case "$1" in -o) out=$2; shift 2 ;; *) shift ;; esac; done\nprintf "echo partial-script-ran\\n" > "$out"\nexit "${FAKE_CURL_STATUS:-0}"\n' > "$remote_root/bin/curl"
+chmod +x "$remote_root/bin/curl"
+output=$(PATH="$remote_root/bin:/usr/bin:/bin" FAKE_CURL_STATUS=18 \
+  sh -c '. "$1"; DRY_RUN=0; run_remote_script https://example.invalid/install.sh sh' sh "$LIB_ROOT/common.sh" 2>&1 || true)
+assert_contains "$output" 'Failed to download installer: https://example.invalid/install.sh'
+assert_not_contains "$output" 'partial-script-ran'
+output=$(PATH="$remote_root/bin:/usr/bin:/bin" \
+  sh -c '. "$1"; DRY_RUN=0; run_remote_script https://example.invalid/install.sh sh' sh "$LIB_ROOT/common.sh" 2>&1)
+assert_contains "$output" 'partial-script-ran'
+
+# Release downloads are installed only when GitHub's published SHA-256 digest
+# matches; a mismatched or missing digest must discard the asset.
+release_root="$test_tmp/release"
+mkdir -p "$release_root/bin"
+printf 'payload\n' > "$release_root/asset"
+good_digest=$(sha256sum "$release_root/asset" | sed 's/ .*//')
+printf '#!/bin/sh\nwhile [ "$#" -gt 0 ]; do case "$1" in -o) out=$2; shift 2 ;; -H|--proto) shift 2 ;; -*) shift ;; *) url=$1; shift ;; esac; done\ncase "$url" in *api.github.com*) cat "$RELEASE_JSON" ;; *) cp "$RELEASE_ASSET" "$out" ;; esac\n' > "$release_root/bin/curl"
+chmod +x "$release_root/bin/curl"
+for digest in "\"sha256:$good_digest\"" '"sha256:0000000000000000000000000000000000000000000000000000000000000000"' null; do
+  printf '{"assets":[{"name":"tool.tar.gz","browser_download_url":"https://github.com/o/r/releases/download/v1/tool.tar.gz","digest":%s}]}' "$digest" > "$release_root/release.json"
+  rm -f "$release_root/out"
+  output=$(PATH="$release_root/bin:/usr/bin:/bin" RELEASE_JSON="$release_root/release.json" RELEASE_ASSET="$release_root/asset" \
+    sh -c '. "$1"; DRY_RUN=0; github_release_download o/r "^tool\\.tar\\.gz\$" "$2" && echo verified' \
+    sh "$LIB_ROOT/common.sh" "$release_root/out" 2>&1 || true)
+  case "$digest" in
+    *"$good_digest"*) assert_contains "$output" 'verified'; assert_file "$release_root/out" ;;
+    null) assert_contains "$output" 'does not publish a SHA-256 digest' ;;
+    *)
+      assert_contains "$output" 'SHA-256 mismatch'
+      if [ -e "$release_root/out" ]; then
+        printf 'FAIL: mismatched release asset was kept\n' >&2
+        failures=$((failures + 1))
+      fi
+      ;;
+  esac
+done
+
 # Regression guarded: the macOS extension installs the Rime frontend.
 output=$(sh "$INSTALLER" --dry-run --os macos extension mac 2>&1)
 assert_contains "$output" 'squirrel'

@@ -10,15 +10,81 @@ run() {
   fi
 }
 
-run_shell() {
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# Download an installer script completely before running it, so a truncated
+# transfer can never execute a partial script. The script is fed to the given
+# command on stdin, matching the vendors' documented `curl ... | sh` usage.
+run_remote_script() {
+  script_url=$1
+  shift
   if [ "$DRY_RUN" -eq 1 ]; then
-    printf '+ sh -c %s\n' "$1"
-  else
-    sh -c "$1"
+    printf '+ curl -fsSL %s | %s\n' "$script_url" "$*"
+    return
+  fi
+
+  script_file=$(mktemp "${TMPDIR:-/tmp}/dotfiles-installer.XXXXXX")
+  if ! curl --proto '=https' --tlsv1.2 -fsSL "$script_url" -o "$script_file"; then
+    rm -f "$script_file"
+    say "Failed to download installer: $script_url" >&2
+    return 1
+  fi
+  script_status=0
+  "$@" < "$script_file" || script_status=$?
+  rm -f "$script_file"
+  return "$script_status"
+}
+
+# Download the asset of a repository's latest GitHub release whose name matches
+# an extended regular expression, and verify it against the SHA-256 digest that
+# GitHub publishes for the asset. Prints nothing and fails when the release
+# metadata, the digest, or the download cannot be confirmed.
+github_release_download() {
+  release_repo=$1
+  asset_pattern=$2
+  asset_dest=$3
+
+  have jq || { say 'jq is required to verify GitHub release downloads.' >&2; return 1; }
+  release_json=$(curl --proto '=https' --tlsv1.2 -fsSL \
+    -H 'Accept: application/vnd.github+json' \
+    "https://api.github.com/repos/$release_repo/releases/latest") || {
+    say "Could not read the latest $release_repo release metadata." >&2
+    return 1
+  }
+  asset_record=$(printf '%s\n' "$release_json" | jq -r --arg pattern "$asset_pattern" '
+    [.assets[] | select(.name | test($pattern))][0]
+    | select(. != null)
+    | "\(.browser_download_url) \(.digest // "")"
+  ') || asset_record=""
+  asset_url=${asset_record% *}
+  asset_digest=${asset_record##* }
+
+  [ -n "$asset_record" ] || { say "No $release_repo release asset matches $asset_pattern." >&2; return 1; }
+  case "$asset_digest" in
+    sha256:????????????????????????????????????????????????????????????????) asset_digest=${asset_digest#sha256:} ;;
+    *) say "The $release_repo release does not publish a SHA-256 digest; refusing to install it." >&2; return 1 ;;
+  esac
+  case "$asset_url" in
+    "https://github.com/$release_repo/releases/download/"*) ;;
+    *) say "Unexpected $release_repo download URL: $asset_url" >&2; return 1 ;;
+  esac
+
+  curl --proto '=https' --tlsv1.2 -fL "$asset_url" -o "$asset_dest" || return 1
+  actual_digest=$(sha256_file "$asset_dest") || return 1
+  if [ "$actual_digest" != "$asset_digest" ]; then
+    rm -f "$asset_dest"
+    say "SHA-256 mismatch for $asset_url; the download was discarded." >&2
+    return 1
   fi
 }
 
-have() { command -v "$1" >/dev/null 2>&1; }
+sha256_file() {
+  if have sha256sum; then
+    sha256sum "$1" | sed 's/ .*//'
+  else
+    shasum -a 256 "$1" | sed 's/ .*//'
+  fi
+}
 
 summary_reset() {
   SUMMARY_ITEMS=""

@@ -45,7 +45,7 @@ chsh -s "$(command -v zsh)"
 | Starship、btop、fastfetch | Starship、zoxide、fastfetch |
 | eza、bat、fd、procs、zoxide、fzf | 仓库可用时安装 btop、bat、fd、eza、procs、fzf |
 
-macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu 和 Debian 12 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。Debian 12 默认只使用已经配置的 APT 仓库；不会添加 backports 或第三方软件源。若 APT 没有 `eza`，安装器会回退到 eza 官方 GitHub Release 二进制；其他仓库中没有的可选软件包会显示 `SKIP`，不会阻断其他安装步骤。
+macOS 使用系统自带的 Zsh、curl、SSH、rsync 等基础命令，因此不会重复安装。Ubuntu 和 Debian 12 会为 `batcat` 和 `fdfind` 创建兼容命令 `bat`、`fd`。Debian 12 默认只使用已经配置的 APT 仓库；不会添加 backports 或第三方软件源。若 APT 没有 `eza` 或 `fastfetch`，安装器会回退到官方 GitHub Release，并先用 GitHub 公布的 SHA-256 校验下载内容；其他仓库中没有的可选软件包会显示 `SKIP`，不会阻断其他安装步骤。
 
 Zinit 只管理 Zsh 插件，并在首次启动 Zsh 时自动安装。当前插件包括 `zsh-completions`、`zsh-autosuggestions` 和 `fast-syntax-highlighting`；最小安装中的 fzf 可用时还会启用 `fzf-tab`。
 
@@ -100,6 +100,8 @@ Chezmoi 将安装器应用到：
 - 普通 CLI：APT 或 Homebrew；
 - Zsh 插件：Zinit；
 - 系统仓库不适合的工具：`installers/` 中的官方脚本或 GitHub Release；
+  - GitHub Release 资产（eza、fastfetch、zoxide、Atuin 安装脚本）必须与 GitHub 公布的 SHA-256 一致才会安装，否则显示 `SKIP`；
+  - 官方安装脚本会先完整下载到临时文件再执行，下载中断时不会执行半截脚本；
 - 开发、AI、服务器及 macOS 专属内容：对应 extension。
 
 一个工具只保留一个主要安装来源，避免与 Zinit、APT、Homebrew 重复安装。
