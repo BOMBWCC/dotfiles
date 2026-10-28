@@ -8,4 +8,6 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_SAVE_NO_DUPS
 setopt HIST_REDUCE_BLANKS
+# Start a command with a space to keep it, and any secret in it, out of history.
+setopt HIST_IGNORE_SPACE
 setopt INTERACTIVE_COMMENTS
