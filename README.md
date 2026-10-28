@@ -82,6 +82,8 @@ dotfiles-install extension mac
 
 AI 扩展中的 Codex CLI 和 Claude Code 依赖 Node.js/npm，先执行 `dotfiles-install extension dev` 并重新打开 Zsh。安装结束后重新打开 Zsh，或执行 `exec zsh`，即可加载 fnm 和用户命令目录。服务器扩展不会显式调用服务启用或启动命令，也不修改防火墙规则；但 Debian 软件包的默认行为仍可能启用或启动服务。
 
+服务器扩展会在安装 `openssh-server` 之前写入 `/etc/ssh/sshd_config.d/10-bombwcc-hardening.conf`，禁用 SSH 密码登录（`PasswordAuthentication no`、`PermitRootLogin prohibit-password`），这样软件包自动启动的 sshd 一开始就只接受密钥登录。为避免把自己锁在门外，只有当前账号的 `~/.ssh/authorized_keys` 中已有公钥时才会写入，否则只给出警告；设置 `DOTFILES_SKIP_SSH_HARDENING=1` 可跳过这一步。若 sshd 之前已在运行，需执行 `sudo systemctl reload ssh` 生效。UFW 只安装不启用；启用前先放行 SSH。注意 Docker 发布的端口会绕过 UFW 规则，不需要公开的端口应绑定到 `127.0.0.1`。
+
 ## 安装器结构
 
 Chezmoi 将安装器应用到：

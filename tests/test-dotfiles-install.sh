@@ -146,6 +146,35 @@ assert_contains "$output" 'openssh-server'
 assert_contains "$output" 'does not explicitly enable or start services or modify firewall rules'
 assert_contains "$output" 'Debian package defaults may still enable or start services.'
 
+# Regression guarded: the server extension writes the sshd hardening drop-in
+# before installing openssh-server, so sshd never starts with password login.
+case "$output" in
+  *'10-bombwcc-hardening.conf'*'openssh-server'*) ;;
+  *)
+    printf 'FAIL: expected SSH hardening before openssh-server installation\n' >&2
+    failures=$((failures + 1))
+    ;;
+esac
+assert_contains "$output" 'bypass UFW'
+
+# Disabling password login without an authorized key would lock the account
+# out, so a real run without one must only warn.
+ssh_home="$test_tmp/ssh-home"
+mkdir -p "$ssh_home/.ssh"
+ssh_check='. "$1"; . "$2"; DRY_RUN=0; as_root() { printf "as_root:%s\n" "$*"; }; install_ssh_hardening'
+output=$(HOME="$ssh_home" sh -c "$ssh_check" sh "$LIB_ROOT/common.sh" "$LIB_ROOT/extensions/server.sh" 2>&1)
+assert_contains "$output" 'SSH password login was left enabled'
+assert_not_contains "$output" 'as_root:'
+printf '# comment only\n' > "$ssh_home/.ssh/authorized_keys"
+output=$(HOME="$ssh_home" sh -c "$ssh_check" sh "$LIB_ROOT/common.sh" "$LIB_ROOT/extensions/server.sh" 2>&1)
+assert_not_contains "$output" 'as_root:'
+printf 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExample test@example\n' >> "$ssh_home/.ssh/authorized_keys"
+output=$(HOME="$ssh_home" sh -c "$ssh_check" sh "$LIB_ROOT/common.sh" "$LIB_ROOT/extensions/server.sh" 2>&1)
+assert_contains "$output" '/etc/ssh/sshd_config.d/10-bombwcc-hardening.conf'
+output=$(HOME="$ssh_home" DOTFILES_SKIP_SSH_HARDENING=1 sh -c "$ssh_check" sh "$LIB_ROOT/common.sh" "$LIB_ROOT/extensions/server.sh" 2>&1)
+assert_contains "$output" 'SKIP: SSH hardening was disabled'
+assert_not_contains "$output" 'as_root:'
+
 # Activating the Linux-only server summary before its platform guard must fail:
 # unsupported macOS runs report only the skip, not a successful Linux plan.
 output=$(sh "$INSTALLER" --dry-run --os macos extension server 2>&1)
