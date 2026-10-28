@@ -133,7 +133,7 @@ chezmoi cd         # 进入本地源仓库
 Fastfetch 还会显示以下联网信息：
 
 - `Weather`：使用 Fastfetch 内置天气模块查询重庆天气，数据来自 `wttr.in`；服务不可达或请求超时时会跳过显示。
-- `GitHub`：通过 `github-pulse-topaz.vercel.app` 查询 `bombwcc` 的 GitHub 活跃状态，并显示状态、BPM 和本周活动量。
+- `GitHub`：通过 `github-pulse-topaz.vercel.app` 查询 `bombwcc` 的 GitHub 活跃状态，并显示状态、BPM 和本周活动量；请求最多等待 2 秒，返回内容中的控制字符会被过滤，避免第三方服务向终端注入转义序列。
 
 ### 常用 Zsh 别名
 
