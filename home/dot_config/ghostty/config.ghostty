@@ -18,7 +18,6 @@ copy-on-select = clipboard
 cursor-color = #d65d0e
 cursor-style = bar
 cursor-style-blink = true
-adjust-cursor-thickness = -1
 
 # Ghostty controls cursor shape and blinking. It also prepares SSH sessions
 # with its terminfo entry, falling back when necessary.
